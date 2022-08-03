@@ -18,10 +18,22 @@ fn main() {
     let mut o = lib::Observer::new();
 
     let x = lib::NetFactory::new_net_io(&lib::NetType::TCP4);
-    let y = lib::NetFactory::new_net_io(&lib::NetType::TCP4);
+    
 
     o.add_data_stream(x);
-    o.add_data_stream(y);
+    
+    println!("Table0");
+    o.get_data();
+
+    o.delete_data_stream(lib::NetType::TCP4);
+    
+    println!("Table1");
+    o.get_data();
+
+    let x = lib::NetFactory::new_net_io(&lib::NetType::TCP4);
+    o.add_data_stream(x);
+        
+    println!("Table2");
     o.get_data();
     
 }

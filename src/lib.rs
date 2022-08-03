@@ -10,13 +10,22 @@ pub struct Observer {
     pub data: Vec<&'static str>
 }
 
-impl  Observer {
+impl Observer {
     pub fn add_data_stream(&mut self, data_stream: Box<dyn NetIO>){
-
         let _ = &self.data_streams.push(data_stream);
-        
     }
-    pub fn delete_data_stream(){
+
+    pub fn delete_data_stream(&mut self, t:NetType){
+        let mut indexes:Vec<usize> = Vec::new();
+
+        for (pos,e) in self.data_streams.iter().enumerate(){
+            if e.test_eq(&t){
+                indexes.push(pos.clone());
+            }            
+        }
+        for i in indexes{
+            let _ = &self.data_streams.remove(i);
+        }
 
     }
 
@@ -56,7 +65,7 @@ pub struct IOStream<T> {
     data_source: T,
 }
 
-
+#[derive(PartialEq)]
 pub enum NetType {
     TCP4,
     TCP6,
@@ -66,12 +75,14 @@ pub enum NetType {
 
 pub trait NetIO {
     fn get_data(&self);
+    fn test_eq(&self, other:&NetType) -> bool;
 }
 
 struct table {
     header: Vec<&'static str>,
     rows: Vec<Vec<String>>,
 }
+
 
 
 struct TCP4{}
@@ -97,6 +108,15 @@ impl NetIO for TCP4{
             data.rows.push(vec![entry.local_address.to_string().clone()])
         }
     }
+
+    fn test_eq(&self, other:&NetType) -> bool{
+        if other == &NetType::TCP4{
+            return true;
+        }
+        return false;
+
+    }
+
 }
 
 pub struct NetFactory;
@@ -109,6 +129,7 @@ impl NetFactory{
             NetType::UDP6 => todo!(),
         }
     }
+
 }
 
 fn get_proc_inode_table() -> HashMap<u64, Stat>{
